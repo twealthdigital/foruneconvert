@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fortune Converts</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        .container {
+            background: #1a1a1a;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+            max-width: 650px;
+            width: 100%;
+            position: relative;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 35px;
+            letter-spacing: 0.5px;
+        }
+
+        .spacer {
+            height: 10px;
+        }
+
+        .upload-area {
+            border: 2px dashed #333;
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #141414;
+            margin-bottom: 25px;
+            margin-top: 10px;
+            position: relative;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: #ff6b6b;
+            background: #1a1a1a;
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover {
+            border-color: #ff8e53;
+            background: #1f1f1f;
+            transform: scale(1.01);
+        }
+
+        .upload-area.has-image {
+            padding: 20px;
+            border-style: solid;
+            border-color: #ff6b6b;
+            cursor: default;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .upload-area.has-image:hover {
+            transform: none;
+            border-color: #ff6b6b;
+        }
+
+        .upload-content {
+            text-align: center;
+            pointer-events: auto;
+        }
+
+        .upload-icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+            color: #ff6b6b;
+        }
+
+        .upload-text {
+            color: #888;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .upload-area.has-image .upload-content {
+            display: none;
+        }
+
+        .image-preview-grid {
+            display: none;
+            width: 100%;
+        }
+
+        .upload-area.has-image .image-preview-grid {
+            display: contents;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: visible;
+            aspect-ratio: 1;
+            background: #2a2a2a;
+            pointer-events: auto;
+            border-radius: 8px;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-close {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            background: #ff6b6b;
+            border: 2px solid #1a1a1a;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 5;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .preview-item:hover .preview-close {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .preview-close:hover {
+            background: #ff8e53;
+            transform: scale(1.2) !important;
+        }
+
+        .image-count-badge {
+            position: absolute;
+            top: -15px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+.format-controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: flex-end;
+}
+
+.custom-select {
+    position: relative;
+    flex: 1;
+}
+
+        .custom-select select {
+            width: 100%;
+            padding: 12px 40px 12px 16px;
+            background: #141414;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .custom-select select:hover {
+            border-color: rgba(255, 107, 107, 0.5);
+            background: #1a1a1a;
+        }
+
+        .custom-select select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            background: #1a1a1a;
+        }
+
+        .custom-select select option {
+            background: #141414;
+            color: #fff;
+            padding: 10px;
+        }
+
+        .custom-select select option:hover,
+        .custom-select select option:checked {
+            background: #ff6b6b !important;
+            color: #fff !important;
+        }
+
+        .custom-select::after {
+            content: '▼';
+            position: absolute;
+            right: 16px;
+            top: 65%;
+            transform: translateY(-50%);
+            color: #ff6b6b;
+            pointer-events: none;
+            font-size: 10px;
+        }
+
+        .quality-slider-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #141414;
+            padding: 8px 16px;
+            border-radius: 12px;
+            border: 1px solid #333;
+        }
+
+        .quality-label {
+            color: #888;
+            font-size: 13px;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+
+        .quality-value {
+            color: #ff6b6b;
+            font-size: 13px;
+            font-weight: 600;
+            min-width: 35px;
+            text-align: right;
+        }
+
+        .custom-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #2a2a2a;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .custom-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255, 107, 107, 0.4);
+            transition: all 0.2s ease;
+        }
+
+        .custom-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.6);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .convert-btn {
+            flex: 1;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .convert-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .convert-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .add-more-btn {
+            padding: 14px;
+            background: #141414;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .add-more-btn:hover {
+            background: #1f1f1f;
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+            transform: translateY(-2px);
+        }
+
+        .download-all-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: transparent;
+            color: #4ade80;
+            border: 2px solid #4ade80;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            animation: slideDown 0.3s ease;
+        }
+
+        .download-all-btn:hover {
+            background: #4ade80;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(74, 222, 128, 0.3);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .clear-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: #141414;
+            color: #ff6b6b;
+            border: 1px solid #333;
+            border-radius: 12px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .clear-btn.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .clear-btn:hover {
+            background: #ff6b6b;
+            color: #fff;
+            border-color: #ff6b6b;
+            transform: rotate(90deg);
+        }
+
+.converted-images {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.image-card {
+    background: #141414;
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    transition: all 0.3s ease;
+    position: relative;
+    cursor: pointer;
+    animation: slideIn 0.3s ease;
+    min-width: 0;
+}
+
+.image-card:hover {
+    border-color: #ff6b6b;
+    background: #1a1a1a;
+    transform: translateY(-3px);
+}
+
+.image-thumbnail {
+    width: 100%;
+    height: 60px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: #2a2a2a;
+}
+
+.image-text-group {
+    flex: 1;
+    min-width: 0;
+}
+
+.image-info {
+    width: 100%;
+    text-align: left;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.image-name {
+    color: #fff;
+    font-size: 8px;
+    font-weight: 500;
+    margin-bottom: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    text-align: left;
+}
+
+.image-size {
+    color: #888;
+    font-size: 7px;
+    text-align: left;
+}
+
+.image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    opacity: 0;
+    transition: all 0.3s ease;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 500;
+}
+
+.card-download {
+    width: 22px;
+    height: 22px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    border: none;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.card-download:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
+}
+
+.card-download span {
+    color: #fff;
+    font-size: 10px;
+}
+
+.download-icon-btn {
+    width: 28px;
+    height: 28px;
+    background: #1a1a1a;
+    border: 2px solid #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.download-icon-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(transparent, #ff6b6b, #ff8e53, transparent);
+    animation: rotate 2s linear infinite;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.download-icon-btn:hover::before {
+    opacity: 1;
+}
+
+.download-icon-btn::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    right: 2px;
+    bottom: 2px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    z-index: 1;
+}
+
+.download-icon-btn:hover {
+    border-color: #ff6b6b;
+    box-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+}
+
+.download-icon-btn span {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.download-icon-btn:hover span {
+    color: #ff6b6b;
+}
+
+.card-close {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 18px;
+    height: 18px;
+    background: #ff6b6b;
+    border: 2px solid #1a1a1a;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+.image-card:hover .card-close {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.card-close:hover {
+    background: #ff8e53;
+    transform: scale(1.2) !important;
+}
+
+
+
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            width: 35px;
+            height: 35px;
+            background: #ff6b6b;
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 5;
+        }
+
+        .modal-close:hover {
+            background: #ff8e53;
+            transform: scale(1.1);
+        }
+
+.bottom-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: none;
+    height: 0;
+    overflow: visible;
+}
+
+.ai-btn, .support-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    color: #fff;
+    border: 2px solid #333;
+    background: #141414;
+    position: fixed;
+    z-index: 99;
+}
+
+        .ai-btn:hover, .support-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+.ai-btn {
+    border-color: #ff6b6b;
+    bottom: 30px;
+    left: 30px;
+}
+
+        .ai-btn:hover {
+            background: #ff6b6b;
+            border-color: #ff6b6b;
+        }
+
+.support-btn {
+    border-color: #ff8e53;
+    bottom: 30px;
+    right: 30px;
+}
+
+        .support-btn:hover {
+            background: #ff8e53;
+            border-color: #ff8e53;
+        }
+
+        .support-popup {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 16px;
+            padding: 20px;
+            min-width: 280px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .support-popup.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .support-popup h3 {
+            color: #ff8e53;
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+
+        .contact-item {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .contact-item a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .contact-item a:hover {
+            color: #ff6b6b;
+        }
+
+        /* Chatbot Styles */
+        .chatbot-overlay {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 16px;
+            width: 350px;
+            max-height: 450px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chatbot-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+            transform: translateY(0);
+        }
+
+        .chatbot-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border-radius: 16px 16px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .chatbot-close {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-close:hover {
+            background: rgba(255, 255, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 300px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-track {
+            background: #141414;
+        }
+
+        .chatbot-messages::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 2px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.5;
+            animation: messageSlide 0.3s ease;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            background: #2a2a2a;
+            color: #fff;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .chatbot-input {
+            padding: 12px 16px;
+            border-top: 1px solid #2a2a2a;
+            display: flex;
+            gap: 8px;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 8px 12px;
+            background: #141414;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .chatbot-input input:focus {
+            border-color: #ff6b6b;
+        }
+
+        .chatbot-input button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-input button:hover {
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+    .more-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 24px;
+        font-weight: 700;
+        border-radius: 8px;
+        pointer-events: none;
+}
+
+.modal-download {
+    position: absolute;
+    top: -15px;
+    right: 30px;
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #ff6b6b, #ff8e53);
+    border: none;
+    border-radius: 20px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    z-index: 5;
+}
+
+.modal-download:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 107, 107, 0.5);
+}
+
+
+@media (max-width: 480px) {
+    .format-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .custom-select {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .custom-select select {
+        flex: 1;
+        min-width: 220px;
+    }
+
+    .quality-slider-container {
+        width: 100%;  /* This makes slider full width */
+    }
+    
+    .select-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #aaa;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+    
+    .custom-select::after {
+        top: 50%;
+    }
+
+    .converted-images {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 4px;
+    }
+    
+    .image-card {
+        padding: 4px;
+        gap: 2px;
+        border-radius: 8px;
+    }
+    
+    .image-thumbnail {
+        height: 50px;
+        border-radius: 4px;
+    }
+    
+    .image-name {
+        font-size: 7px;
+    }
+    
+    .image-size {
+        font-size: 6px;
+    }
+    
+    .card-download {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+    }
+    
+    .card-download span {
+        font-size: 8px;
+    }
+    
+    .card-close {
+        width: 14px;
+        height: 14px;
+        font-size: 6px;
+        top: -5px;
+        right: -5px;
+    }
+    
+    .container {
+        padding: 20px;
+    }
+    
+    .logo h1 {
+        font-size: 24px;
+    }
+    
+    .upload-area {
+        padding: 20px;
+    }
+    
+    .upload-area.has-image {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+    
+    .button-group {
+        flex-direction: row;
+    }
+    
+    .preview-item {
+        border-radius: 6px;
+    }
+    
+    .preview-close {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+        top: -6px;
+        right: -6px;
+    }
+    
+    .modal-download {
+        top: -12px;
+        right: 25px;
+        padding: 6px 12px;
+        font-size: 11px;
+    }
+    
+    .modal-close {
+        width: 28px;
+        height: 28px;
+        font-size: 14px;
+        top: -12px;
+        right: -12px;
+    }
+}
+
+.select-label {
+    color: #888;
+    font-size: 11px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="clear-btn" id="clearBtn" title="Clear All">✕</button>
+        
+        <div class="logo">
+            <h1>Fortune Converts</h1>
+        </div>
+        
+        <div class="subtitle">
+            Fast image conversion • Multiple formats • Browser-based
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-content">
+                <div class="upload-icon">+</div>
+                <div class="upload-text" id="uploadText">Click to upload or paste an image</div>
+            </div>
+            <div class="image-preview-grid" id="imagePreviewGrid"></div>
+            <div class="image-count-badge" id="imageCount" style="display: none;">1 image</div>
+            <input type="file" id="fileInput" accept="image/*" multiple hidden>
+        </div>
+
+        <div class="format-controls">
+            <div class="custom-select">
+                <label class="select-label">Convert to:</label>
+                <select id="formatSelect">
+                    <option value="image/png">PNG</option>
+                    <option value="image/jpeg">JPEG</option>
+                    <option value="image/jpg">JPG</option>
+                    <option value="image/webp">WebP</option>
+                    <option value="image/bmp">BMP</option>
+                    <option value="image/gif">GIF</option>
+                    <option value="image/tiff">TIFF</option>
+                    <option value="image/x-icon">ICO</option>
+                    <option value="image/svg+xml">SVG</option>
+                    <option value="image/avif">AVIF</option>
+                    <option value="image/jp2">JPEG 2000</option>
+                    <option value="image/heic">HEIC</option>
+                    <option value="image/heif">HEIF</option>
+                </select>
+            </div>
+            
+            <div class="quality-slider-container">
+                <span class="quality-label">Quality</span>
+                <input type="range" class="custom-slider" id="qualitySlider" min="1" max="100" value="92">
+                <span class="quality-value" id="qualityValue">92%</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="convert-btn" id="convertBtn">Convert Selected</button>
+            <button class="add-more-btn" id="addMoreBtn" title="Add more images">+</button>
+        </div>
+
+        <button class="download-all-btn hidden" id="downloadAllBtn">📦 Download All as ZIP</button>
+
+        <div class="converted-images" id="convertedImages"></div>
+
+        <div class="bottom-section">
+            <button class="ai-btn" id="aiBtn" title="Forb - AI Assistant">🤖</button>
+            <button class="support-btn" id="supportBtn" title="Customer Support">💬</button>
+        </div>
+
+        <div class="support-popup" id="supportPopup">
+            <h3>Contact Fortune</h3>
+            <div class="contact-item">
+                📞 <a href="tel:+2347025723662">+234 702 572 3662</a>
+            </div>
+            <div class="contact-item">
+                📞 <a href="tel:+2349158635597">+234 915 863 5597</a>
+            </div>
+            <div class="contact-item">
+                📧 <a href="mailto:adeolafortuneadeola12345@gmail.com">adeolafortuneadeola12345@gmail.com</a>
+            </div>
+            <div class="contact-item" style="margin-top: 10px; color: #ff6b6b; font-size: 12px;">
+                💬 Numbers also available on WhatsApp
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot -->
+    <div class="chatbot-overlay" id="chatbotOverlay">
+        <div class="chatbot-header">
+            <h3>Forb - AI Assistant</h3>
+            <button class="chatbot-close" id="chatbotClose">✕</button>
+        </div>
+        <div class="chatbot-messages" id="chatbotMessages">
+            <div class="message bot">
+                Hello! 👋 I'm Forb, your Fortune Converts assistant. Ask me anything about the image converter!
+            </div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbotInput" placeholder="Type your message...">
+            <button id="chatbotSend">Send</button>
+        </div>
+    </div>
+
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+        <button class="modal-close" id="modalClose">✕</button>
+        <button class="modal-download" id="modalDownload" title="Download">⬇ Download</button>
+        <img id="modalImage" src="" alt="Preview">
+    </div>
+</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+    let imageFiles = [];
+    let convertedBlobs = [];
+    let imagePreviewUrls = [];
+    let currentPreviewBlob = null;
+    let currentPreviewName = '';
+    let isConverting = false;
+
+    // DOM Elements
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadText = document.getElementById('uploadText');
+    const imagePreviewGrid = document.getElementById('imagePreviewGrid');
+    const imageCount = document.getElementById('imageCount');
+    const formatSelect = document.getElementById('formatSelect');
+    const qualitySlider = document.getElementById('qualitySlider');
+    const qualityValue = document.getElementById('qualityValue');
+    const convertBtn = document.getElementById('convertBtn');
+    const addMoreBtn = document.getElementById('addMoreBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const downloadAllBtn = document.getElementById('downloadAllBtn');
+    const convertedImages = document.getElementById('convertedImages');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalImage = document.getElementById('modalImage');
+    const modalClose = document.getElementById('modalClose');
+    const modalDownload = document.getElementById('modalDownload');
+    const aiBtn = document.getElementById('aiBtn');
+    const supportBtn = document.getElementById('supportBtn');
+    const supportPopup = document.getElementById('supportPopup');
+    const chatbotOverlay = document.getElementById('chatbotOverlay');
+    const chatbotClose = document.getElementById('chatbotClose');
+    const chatbotMessages = document.getElementById('chatbotMessages');
+    const chatbotInput = document.getElementById('chatbotInput');
+    const chatbotSend = document.getElementById('chatbotSend');
+
+    // Quality slider
+    qualitySlider.addEventListener('input', (e) => {
+        qualityValue.textContent = e.target.value + '%';
+    });
+
+    // Upload area click
+    uploadArea.addEventListener('click', (e) => {
+        if (!uploadArea.classList.contains('has-image')) {
+            fileInput.click();
+        }
+    });
+
+    // File input change
+    fileInput.addEventListener('change', (e) => {
+        handleFiles(e.target.files);
+        fileInput.value = '';
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        if (!uploadArea.classList.contains('has-image')) {
+            uploadArea.classList.add('dragover');
+        }
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        if (!uploadArea.classList.contains('has-image')) {
+            handleFiles(e.dataTransfer.files);
+        }
+    });
+
+    // Paste functionality
+    document.addEventListener('paste', (e) => {
+        const items = e.clipboardData.items;
+        for (let item of items) {
+            if (item.type.startsWith('image/')) {
+                const file = item.getAsFile();
+                handleFiles([file]);
+            }
+        }
+    });
+
+    function handleFiles(files) {
+        const newFiles = Array.from(files);
+        imageFiles = [...newFiles, ...imageFiles];
+        updateUI();
+    }
+
+    function updateUI() {
+        imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+        imagePreviewUrls = [];
+        
+        if (imageFiles.length > 0) {
+            uploadArea.classList.add('has-image');
+            clearBtn.classList.add('visible');
+            
+            imagePreviewGrid.innerHTML = '';
+            const maxVisible = window.innerWidth <= 480 ? 4 : 8;
+            const filesToShow = imageFiles.slice(0, maxVisible);
+            
+            filesToShow.forEach((file, index) => {
+                const url = URL.createObjectURL(file);
+                imagePreviewUrls.push(url);
+                
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                
+                if (index === maxVisible - 1 && imageFiles.length > maxVisible) {
+                    const remaining = imageFiles.length - maxVisible;
+                    previewItem.innerHTML = `
+                        <img src="${url}" alt="Image ${index + 1}">
+                        <div class="more-overlay">+${remaining}</div>
+                        <button class="preview-close" data-index="${index}">✕</button>
+                    `;
+                } else {
+                    previewItem.innerHTML = `
+                        <img src="${url}" alt="Image ${index + 1}">
+                        <button class="preview-close" data-index="${index}">✕</button>
+                    `;
+                }
+                
+                previewItem.querySelector('.preview-close').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeImage(index);
+                });
+                
+                imagePreviewGrid.appendChild(previewItem);
+            });
+            
+            imageCount.style.display = 'block';
+            imageCount.textContent = imageFiles.length + ' image' + (imageFiles.length > 1 ? 's' : '');
+            
+        } else {
+            uploadArea.classList.remove('has-image');
+            clearBtn.classList.remove('visible');
+            imagePreviewGrid.innerHTML = '';
+            imageCount.style.display = 'none';
+            downloadAllBtn.classList.add('hidden');
+        }
+    }
+
+    function removeImage(index) {
+        imageFiles.splice(index, 1);
+        updateUI();
+        
+        if (convertedBlobs.length > 0 && index < convertedBlobs.length) {
+            convertedBlobs.splice(index, 1);
+            displayConvertedImages();
+        }
+    }
+
+    // Add more button
+    addMoreBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+
+    // FASTEST convertImage using URL.createObjectURL
+    function convertImage(file, format, quality) {
+        return new Promise((resolve) => {
+            const url = URL.createObjectURL(file);
+            const img = new Image();
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob((blob) => {
+                    resolve(blob);
+                }, format, quality);
+            };
+            img.src = url;
+        });
+    }
+
+    // Convert button - MAX SPEED
+    convertBtn.addEventListener('click', async () => {
+        if (imageFiles.length === 0) return;
+
+        isConverting = true;
+        
+        // DISABLE ALL
+        convertBtn.disabled = true;
+        addMoreBtn.disabled = true;
+        addMoreBtn.style.pointerEvents = 'none';
+        formatSelect.disabled = true;
+        qualitySlider.disabled = true;
+        uploadArea.style.pointerEvents = 'none';
+        fileInput.disabled = true;
+        convertedImages.style.pointerEvents = 'none';
+        downloadAllBtn.style.pointerEvents = 'none';
+        document.body.style.userSelect = 'none';
+        clearBtn.style.pointerEvents = 'auto';
+
+        document.querySelectorAll('.preview-close').forEach(btn => {
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0';
+        });
+
+        convertBtn.textContent = 'Converting...';
+        convertedBlobs = [];
+
+        const format = formatSelect.value;
+        const quality = qualitySlider.value / 100;
+        const total = imageFiles.length;
+        const BATCH_SIZE = 50;
+        
+        for (let i = 0; i < total; i += BATCH_SIZE) {
+            if (!isConverting) break;
+            
+            const batch = imageFiles.slice(i, i + BATCH_SIZE);
+            const batchPromises = batch.map(file => convertImage(file, format, quality));
+            const batchResults = await Promise.all(batchPromises);
+            
+            if (!isConverting) break;
+            
+            batchResults.forEach((blob, batchIndex) => {
+                const fileIndex = i + batchIndex;
+                const file = imageFiles[fileIndex];
+                convertedBlobs.push({
+                    blob: blob,
+                    name: file.name.replace(/\.[^/.]+$/, '') + '.' + format.split('/')[1],
+                    originalName: file.name
+                });
+            });
+            
+            const progress = Math.min(Math.round((i + batch.length) / total * 100), 100);
+            convertBtn.textContent = `Converting ${progress}%...`;
+        }
+
+        if (!isConverting) return;
+
+        isConverting = false;
+        displayConvertedImages();
+        
+        // RE-ENABLE ALL
+        convertBtn.disabled = false;
+        addMoreBtn.disabled = false;
+        addMoreBtn.style.pointerEvents = 'auto';
+        formatSelect.disabled = false;
+        qualitySlider.disabled = false;
+        uploadArea.style.pointerEvents = 'auto';
+        fileInput.disabled = false;
+        convertedImages.style.pointerEvents = 'auto';
+        downloadAllBtn.style.pointerEvents = 'auto';
+        document.body.style.userSelect = 'auto';
+
+        document.querySelectorAll('.preview-close').forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+        });
+        
+        convertBtn.textContent = 'Convert Selected';
+    });
+
+    function displayConvertedImages() {
+        convertedImages.innerHTML = '';
+        
+        if (convertedBlobs.length > 1) {
+            downloadAllBtn.classList.remove('hidden');
+        } else {
+            downloadAllBtn.classList.add('hidden');
+        }
+        
+        convertedBlobs.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'image-card';
+            
+            const url = URL.createObjectURL(item.blob);
+            
+            card.innerHTML = `
+                <button class="card-close" data-index="${index}">✕</button>
+                <img src="${url}" class="image-thumbnail" alt="${item.name}">
+                <div class="image-info">
+                    <div class="image-text-group">
+                        <div class="image-name">${item.name}</div>
+                        <div class="image-size">${formatBytes(item.blob.size)}</div>
+                    </div>
+                    <button class="card-download" data-index="${index}" title="Download">
+                        <span>⬇</span>
+                    </button>
+                </div>
+            `;
+            
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('.card-download') && !e.target.closest('.card-close')) {
+                    previewImage(url, item.name, item.blob);
+                }
+            });
+            
+            card.querySelector('.card-download').addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadBlob(item.blob, item.name);
+            });
+            
+            card.querySelector('.card-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                removeConvertedImage(index);
+            });
+            
+            convertedImages.appendChild(card);
+        });
+    }
+
+    function removeConvertedImage(index) {
+        convertedBlobs.splice(index, 1);
+        imageFiles.splice(index, 1);
+        displayConvertedImages();
+        updateUI();
+    }
+
+    function previewImage(url, name, blob) {
+        modalImage.src = url;
+        currentPreviewBlob = blob;
+        currentPreviewName = name;
+        modalOverlay.classList.add('active');
+    }
+
+    function downloadBlob(blob, filename) {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Download all as ZIP
+    downloadAllBtn.addEventListener('click', async () => {
+        if (convertedBlobs.length === 0) return;
+        
+        const zip = new JSZip();
+        
+        convertedBlobs.forEach((item) => {
+            zip.file(item.name, item.blob);
+        });
+        
+        const content = await zip.generateAsync({type: 'blob'});
+        saveAs(content, 'fortune-converted-images.zip');
+    });
+
+    // Modal close
+    modalClose.addEventListener('click', () => {
+        modalOverlay.classList.remove('active');
+    });
+
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+            modalOverlay.classList.remove('active');
+        }
+    });
+
+    // Modal download
+    modalDownload.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (currentPreviewBlob) {
+            downloadBlob(currentPreviewBlob, currentPreviewName);
+        }
+    });
+
+    // Clear button - FULL RESET
+    clearBtn.addEventListener('click', () => {
+        isConverting = false;
+        
+        imageFiles = [];
+        convertedBlobs = [];
+        imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+        imagePreviewUrls = [];
+        currentPreviewBlob = null;
+        currentPreviewName = '';
+        
+        convertedImages.innerHTML = '';
+        imagePreviewGrid.innerHTML = '';
+        downloadAllBtn.classList.add('hidden');
+        
+        // RE-ENABLE EVERYTHING
+        convertBtn.disabled = false;
+        addMoreBtn.disabled = false;
+        addMoreBtn.style.pointerEvents = 'auto';
+        formatSelect.disabled = false;
+        qualitySlider.disabled = false;
+        qualitySlider.value = 92;
+        qualityValue.textContent = '92%';
+        uploadArea.style.pointerEvents = 'auto';
+        fileInput.disabled = false;
+        convertedImages.style.pointerEvents = 'auto';
+        downloadAllBtn.style.pointerEvents = 'auto';
+        document.body.style.userSelect = 'auto';
+        
+        uploadArea.classList.remove('has-image');
+        clearBtn.classList.remove('visible');
+        imageCount.style.display = 'none';
+        convertBtn.textContent = 'Convert Selected';
+        
+        document.querySelectorAll('.preview-close').forEach(btn => {
+            btn.style.pointerEvents = 'auto';
+        });
+        
+        formatSelect.selectedIndex = 0;
+    });
+
+    // Support popup
+    supportBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Close chatbot if open
+        chatbotOverlay.classList.remove('active');
+        supportPopup.classList.toggle('active');
+    });
+
+    // AI button - toggle chatbot
+    aiBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        // Close support popup if open
+        supportPopup.classList.remove('active');
+        chatbotOverlay.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!supportPopup.contains(e.target) && e.target !== supportBtn) {
+            supportPopup.classList.remove('active');
+        }
+        if (!chatbotOverlay.contains(e.target) && e.target !== aiBtn) {
+            chatbotOverlay.classList.remove('active');
+        }
+    });
+
+    // Chatbot
+    const chatbotKnowledge = {
+        greetings: ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening'],
+        about: ['what is this', 'about', 'who are you', 'what do you do', 'help'],
+        formats: ['format', 'formats', 'supported', 'what formats', 'available formats'],
+        howto: ['how to', 'how do i', 'steps', 'guide', 'tutorial', 'convert'],
+        quality: ['quality', 'compression', 'size', 'resolution'],
+        features: ['features', 'what can you do', 'capabilities'],
+        contact: ['contact', 'support', 'help me', 'phone', 'email', 'whatsapp'],
+        pricing: ['price', 'cost', 'free', 'payment', 'money']
+    };
+
+    function getBotResponse(message) {
+        const msg = message.toLowerCase();
+        
+        if (chatbotKnowledge.greetings.some(word => msg.includes(word))) {
+            return "Hello! 👋 I'm Forb, your Fortune Converts assistant. I can help you with image conversion. What would you like to know?";
+        }
+        
+        if (chatbotKnowledge.about.some(word => msg.includes(word))) {
+            return "Fortune Converts is a powerful browser-based image converter. You can upload images, choose from 12+ formats, adjust quality, and download your converted images instantly - all without uploading to any server! Your privacy is guaranteed.";
+        }
+        
+        if (chatbotKnowledge.formats.some(word => msg.includes(word))) {
+            return "We support 13 image formats: PNG, JPEG, JPG, WebP, BMP, GIF, TIFF, ICO, SVG, AVIF, JPEG 2000, HEIC, and HEIF.";
+        }
+        
+        if (chatbotKnowledge.howto.some(word => msg.includes(word))) {
+            return "Here's how: 1) Click + to add images 2) Select format from dropdown 3) Adjust quality slider 4) Click 'Convert Selected' 5) Download individual or ZIP.";
+        }
+        
+        if (chatbotKnowledge.quality.some(word => msg.includes(word))) {
+            return "Higher quality (90-100%) = better images but larger files. Lower (50-70%) = smaller files. Default is 92% for best balance.";
+        }
+        
+        if (chatbotKnowledge.features.some(word => msg.includes(word))) {
+            return "Features: 13+ formats, Quality slider, Batch conversion, Preview, Download all as ZIP, Drag & drop, Paste from clipboard, 100% private.";
+        }
+        
+        if (chatbotKnowledge.contact.some(word => msg.includes(word))) {
+            return "Contact Fortune: 📞 +234 702 572 3662 / +234 915 863 5597 (WhatsApp too) 📧 adeolafortuneadeola12345@gmail.com";
+        }
+        
+        if (chatbotKnowledge.pricing.some(word => msg.includes(word))) {
+            return "Fortune Converts is completely FREE! No hidden costs, no subscriptions, no watermarks. Convert unlimited images anytime.";
+        }
+        
+        if (msg.includes('thank')) {
+            return "You're welcome! 😊";
+        }
+        
+        if (msg.includes('bye') || msg.includes('goodbye')) {
+            return "Goodbye! 👋";
+        }
+        
+        return "I'm Forb! Ask me about formats, how to convert, quality settings, features, contact info, or pricing.";
+    }
+
+    function addChatMessage(message, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        messageDiv.textContent = message;
+        chatbotMessages.appendChild(messageDiv);
+        chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function handleChatSend() {
+        const message = chatbotInput.value.trim();
+        if (!message) return;
+        
+        addChatMessage(message, true);
+        chatbotInput.value = '';
+        
+        setTimeout(() => {
+            const response = getBotResponse(message);
+            addChatMessage(response, false);
+        }, 500);
+    }
+
+    chatbotSend.addEventListener('click', handleChatSend);
+    chatbotInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleChatSend();
+    });
+
+
+    chatbotClose.addEventListener('click', () => {
+        chatbotOverlay.classList.remove('active');
+    });
+
+
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    window.addEventListener('beforeunload', () => {
+        imagePreviewUrls.forEach(url => URL.revokeObjectURL(url));
+        convertedBlobs.forEach(item => {
+            if (item.blob) URL.revokeObjectURL(URL.createObjectURL(item.blob));
+        });
+        imageFiles = [];
+        convertedBlobs = [];
+    });
+</script>
+</body>
+</html>
